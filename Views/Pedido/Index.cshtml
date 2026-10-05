@@ -1,0 +1,58 @@
+﻿@model IEnumerable<CafeteriaWeb.Dtos.PedidoDto>
+@{
+    ViewData["Title"] = "Historial de Pedidos";
+}
+
+<div class="container mt-4">
+    <h2>Historial de Ventas</h2>
+    <hr />
+
+    <a asp-action="Crear" class="btn btn-primary mb-3">🛒 Nueva Venta</a>
+    <a asp-controller="Menu" asp-action="Index" class="btn btn-secondary mb-3 ms-2">Volver al Menú</a>
+    <a asp-action="ExportarReportePDF" target="_blank" class="btn btn-outline-danger mb-3 ms-2">📊 Exportar Reporte (PDF)</a>
+    <div class="table-responsive shadow">
+        <table class="table table-bordered table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Cliente</th>
+                    <th>Fecha y Hora</th>
+                    <th>Total (S/)</th>
+                    <th>Estado</th>
+                    <th>Acciones</th> 
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="align-middle">@item.IdPedido</td>
+                        <td class="align-middle">@item.NombreCliente</td>
+                        <td class="align-middle">@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="align-middle fw-bold text-success">S/ @item.Total.ToString("0.00")</td>
+                        <td class="align-middle">
+                            @if (item.Estado == "COMPLETADO")
+                            {
+                                <span class="badge bg-success">Completado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Anulado</span>
+                            }
+                        </td>
+                        <td class="align-middle">
+                            @if (item.Estado == "COMPLETADO")
+                            {
+                                <a asp-action="Anular" asp-route-id="@item.IdPedido" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Seguro que deseas ANULAR esta venta?');">Anular</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Sin acciones</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

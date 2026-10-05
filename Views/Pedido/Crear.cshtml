@@ -1,0 +1,192 @@
+﻿@{
+    ViewData["Title"] = "Punto de Venta";
+    var productos = ViewBag.Productos as List<CafeteriaWeb.Dtos.ProductoDto>;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Punto de Venta (POS)</h2>
+        <a asp-action="Index" class="btn btn-secondary">Ver Historial</a>
+    </div>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white fw-bold">Agregar Productos</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Producto</label>
+                            <select id="cboProducto" class="form-select">
+                                <option value="">-- Seleccione Producto --</option>
+                                @if (productos != null)
+                                {
+                                    foreach (var p in productos)
+                                    {
+                                        <option value="@p.IdProducto" data-precio="@p.Precio" data-nombre="@p.Nombre" data-stock="@p.Stock">
+                                            @p.Nombre - S/ @p.Precio (Stock: @p.Stock)
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Cantidad</label>
+                            <div class="input-group">
+                                <input type="number" id="txtCantidad" class="form-control" value="1" min="1" />
+                                <button type="button" class="btn btn-success" id="btnAgregar">Agregar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white fw-bold">Detalle de la Boleta</div>
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Cliente</label>
+                        <select id="cboCliente" class="form-select" asp-items="ViewBag.Clientes">
+                            <option value="">-- Seleccione Cliente --</option>
+                        </select>
+                    </div>
+
+                    <table class="table table-sm table-bordered mt-3">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCarrito">
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <h4 class="mb-0">Total: <span class="text-success" id="lblTotal">S/ 0.00</span></h4>
+                        <button type="button" class="btn btn-primary btn-lg" id="btnProcesar">Procesar Venta</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let carrito = [];
+        let totalBoleta = 0;
+
+        document.getElementById("btnAgregar").addEventListener("click", function () {
+            const cbo = document.getElementById("cboProducto");
+            const cantidad = parseInt(document.getElementById("txtCantidad").value);
+
+            if (cbo.value === "" || cantidad <= 0) {
+                alert("Seleccione un producto y cantidad valida.");
+                return;
+            }
+
+            const opcionSeleccionada = cbo.options[cbo.selectedIndex];
+            const idProducto = parseInt(cbo.value);
+            const nombre = opcionSeleccionada.getAttribute("data-nombre");
+            const precio = parseFloat(opcionSeleccionada.getAttribute("data-precio"));
+            const stock = parseInt(opcionSeleccionada.getAttribute("data-stock"));
+
+            if (cantidad > stock) {
+                alert("No hay suficiente stock. Solo quedan " + stock + " unidades.");
+                return;
+            }
+
+            const existe = carrito.find(p => p.IdProducto === idProducto);
+            if (existe) {
+                if ((existe.Cantidad + cantidad) > stock) {
+                    alert("Superas el stock disponible con lo que ya tienes en el carrito.");
+                    return;
+                }
+                existe.Cantidad += cantidad;
+                existe.Subtotal = existe.Cantidad * existe.Precio;
+            } else {
+                carrito.push({
+                    IdProducto: idProducto,
+                    NombreProducto: nombre,
+                    Cantidad: cantidad,
+                    Precio: precio,
+                    Subtotal: cantidad * precio
+                });
+            }
+
+            actualizarTabla();
+        });
+
+        function actualizarTabla() {
+            const tbody = document.getElementById("tablaCarrito");
+            tbody.innerHTML = "";
+            totalBoleta = 0;
+
+            carrito.forEach((item, index) => {
+                totalBoleta += item.Subtotal;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.NombreProducto}</td>
+                        <td>${item.Cantidad}</td>
+                        <td>S/ ${item.Subtotal.toFixed(2)}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(${index})">X</button></td>
+                    </tr>`;
+            });
+
+            document.getElementById("lblTotal").innerText = "S/ " + totalBoleta.toFixed(2);
+        }
+
+        function eliminarFila(index) {
+            carrito.splice(index, 1);
+            actualizarTabla();
+        }
+
+        document.getElementById("btnProcesar").addEventListener("click", function () {
+            const idCliente = document.getElementById("cboCliente").value;
+
+            if (idCliente === "") {
+                alert("Debe seleccionar un cliente.");
+                return;
+            }
+            if (carrito.length === 0) {
+                alert("El carrito esta vacio.");
+                return;
+            }
+
+            //MAPEO ESTRUCTURADO MULTIPRODUCTO COMPATIBLE CON EL DTO
+            const pedidoData = {
+                IdCliente: parseInt(idCliente),
+                Total: totalBoleta,
+                Detalles: carrito.map(item => ({
+                    IdProducto: item.IdProducto,
+                    Cantidad: item.Cantidad,
+                    Precio: item.Precio,
+                    Subtotal: item.Subtotal
+                }))
+            };
+
+            fetch('/Pedido/GuardarVenta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pedidoData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exito) {
+                    alert(data.mensaje);
+                    window.location.href = '/Pedido/Index';
+                } else {
+                    alert(data.mensaje);
+                }
+            });
+        });
+    </script>
+}

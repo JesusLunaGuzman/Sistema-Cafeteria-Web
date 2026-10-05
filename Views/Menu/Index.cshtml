@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Panel Principal";
+}
+
+<div class="p-5 mb-4 rounded-3 shadow-lg" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000') no-repeat center center; background-size: cover; color: white;">
+    <div class="container-fluid py-5 text-center">
+        <h1 class="display-4 fw-bold">Cafetería Web</h1>
+        <p class="col-md-8 mx-auto fs-4 mt-3">
+            Sistema de Gestión de Ventas e Inventario. Administra tu catálogo y procesa pedidos de forma rápida y segura.
+        </p>
+    </div>
+</div>
+
+    <div class="row mt-5">
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Categoria" asp-action="Index" class="btn btn-outline-primary w-100 p-4 shadow-sm">
+                <h3 class="display-5">📦</h3>
+                <h5>Categorías</h5>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Producto" asp-action="Index" class="btn btn-outline-success w-100 p-4 shadow-sm">
+                <h3 class="display-5">☕</h3>
+                <h5>Productos</h5>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Cliente" asp-action="Index" class="btn btn-outline-warning w-100 p-4 shadow-sm">
+                <h3 class="display-5">👥</h3>
+                <h5>Clientes</h5>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Pedido" asp-action="Index" class="btn btn-outline-danger w-100 p-4 shadow-sm">
+                <h3 class="display-5">📝</h3>
+                <h5>Pedidos</h5>
+            </a>
+        </div>
+    </div>

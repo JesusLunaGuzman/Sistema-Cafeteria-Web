@@ -1,0 +1,120 @@
+﻿@model CafeteriaWeb.Dtos.LoginDto
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - Cafetería Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+        body {
+            
+            background-color: #a07b5a;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 850px;
+            padding: 15px;
+        }
+
+        .titulo-gigante {
+            color: #ffffff;
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card-split {
+            display: flex;
+            background-color: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: none;
+        }
+
+        .login-image {
+            flex: 1;
+            background-image: url('https://images.unsplash.com/photo-1595434091143-b375ace5d462?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            display: none;
+        }
+
+        
+        @@media (min-width: 768px) {
+            .login-image {
+                display: block;
+            }
+        }
+
+        .login-form-side {
+            flex: 1;
+            padding: 50px;
+        }
+
+        .btn-cafe {
+            background-color: #5c3a21;
+            border-color: #5c3a21;
+            color: white;
+            transition: all 0.3s;
+        }
+
+            .btn-cafe:hover {
+                background-color: #3b2412;
+                border-color: #3b2412;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1 class="titulo-gigante">Cafetería Web</h1>
+
+        <div class="card card-split">
+            <div class="login-image"></div>
+
+            <div class="login-form-side">
+                <h5 class="text-center text-muted mb-4 fw-bold">Acceso de Personal</h5>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger text-center rounded-3 fw-bold">
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <form asp-controller="Login" asp-action="Ingresar" method="post">
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fw-bold">Correo electrónico</label>
+                        <input asp-for="Correo" class="form-control form-control-lg bg-light border-0" type="email" placeholder="ejemplo@correo.com" required />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary fw-bold">Contraseña</label>
+                        <input asp-for="Clave" class="form-control form-control-lg bg-light border-0" type="password" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-cafe w-100 fw-bold fs-5 py-2 rounded-3">Ingresar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

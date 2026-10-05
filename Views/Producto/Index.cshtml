@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CafeteriaWeb.Dtos.ProductoDto>
+
+@{
+    ViewData["Title"] = "Productos";
+}
+
+<div class="container mt-4">
+    <h2>Mantenimiento de Productos</h2>
+    <hr />
+
+    <a asp-action="Crear" class="btn btn-success mb-3">Nuevo Producto</a>
+    <a asp-controller="Menu" asp-action="Index" class="btn btn-secondary mb-3 ms-2">Volver al Menú</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.IdProducto</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.NombreCategoria</td>
+                    <td>S/ @item.Precio</td>
+                    <td>@item.Stock</td>
+                    <td>
+                        @if (item.Estado)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@item.IdProducto" class="btn btn-warning btn-sm">Editar</a>
+                        @if (item.Estado)
+                        {
+                            <a asp-action="Eliminar" asp-route-id="@item.IdProducto" class="btn btn-danger btn-sm text-white" onclick="return confirm('¿Estás seguro que deseas dar de baja este producto?');">Eliminar</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Activar" asp-route-id="@item.IdProducto" class="btn btn-success btn-sm text-white" onclick="return confirm('¿Estás seguro que deseas volver a activar este producto?');">Activar</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
