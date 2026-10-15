@@ -80,5 +80,27 @@ namespace CafeteriaWeb.Controllers
             // PASAMOS LA LISTA COMPLETA A UNA VISTA ESPECIAL DE IMPRESION
             return View(pedidos);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarReporteExcel()
+        {
+            // Obtenemos el historial completo de ventas
+            var pedidos = await _pedidoService.ListarPedidos();
+
+            // Construimos el contenido del archivo en memoria
+            var builder = new System.Text.StringBuilder();
+
+            // Escribimos las cabeceras (usamos punto y coma para que Excel lo separe correctamente en columnas)
+            builder.AppendLine("ID Pedido;Cliente;Fecha y Hora;Total (S/);Estado");
+
+            // Recorremos los datos y escribimos cada fila
+            foreach (var item in pedidos)
+            {
+                builder.AppendLine($"{item.IdPedido};{item.NombreCliente};{item.Fecha.ToString("dd/MM/yyyy HH:mm")};{item.Total.ToString("0.00")};{item.Estado}");
+            }
+
+            // Convertimos el texto a bytes y retornamos el archivo para su descarga
+            return File(System.Text.Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "Reporte_Ventas_Cafeteria.csv");
+        }
     }
 }
